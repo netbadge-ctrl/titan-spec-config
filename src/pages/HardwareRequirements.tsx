@@ -28,9 +28,9 @@ const hardwareCategories = {
       { key: "最大功耗(W)", label: "最大功耗(W)" },
     ],
   },
-  Memory: {
+  内存: {
     icon: Database,
-    color: "bg-blue-50 dark:bg-blue-900/20",
+    color: "bg-slate-50 dark:bg-slate-800/50",
     fields: [
       { key: "规格", label: "规格" },
       { key: "引入状态", label: "引入状态" },
@@ -44,9 +44,9 @@ const hardwareCategories = {
       { key: "最大功耗(W)", label: "最大功耗(W)" },
     ],
   },
-  NIC: {
+  网卡: {
     icon: Network,
-    color: "bg-indigo-50 dark:bg-indigo-900/20",
+    color: "bg-slate-50 dark:bg-slate-800/50",
     fields: [
       { key: "规格", label: "规格" },
       { key: "引入状态", label: "引入状态" },
@@ -61,9 +61,43 @@ const hardwareCategories = {
       { key: "最大功耗(W)", label: "最大功耗(W)" },
     ],
   },
-  Storage: {
+  HDD: {
     icon: HardDrive,
-    color: "bg-gray-50 dark:bg-gray-800/50",
+    color: "bg-slate-50 dark:bg-slate-800/50",
+    fields: [
+      { key: "规格", label: "规格" },
+      { key: "引入状态", label: "引入状态" },
+      { key: "状态", label: "状态" },
+      { key: "厂商", label: "厂商" },
+      { key: "容量", label: "容量" },
+      { key: "盘体尺寸", label: "盘体尺寸" },
+      { key: "物理接口", label: "物理接口" },
+      { key: "接口速度(Gb/s)", label: "接口速度(Gb/s)" },
+      { key: "顺序读(MB/s)", label: "顺序读(MB/s)" },
+      { key: "顺序写(MB/s)", label: "顺序写(MB/s)" },
+      { key: "最大功耗(W)", label: "最大功耗(W)" },
+    ],
+  },
+  SSD: {
+    icon: HardDrive,
+    color: "bg-slate-50 dark:bg-slate-800/50",
+    fields: [
+      { key: "规格", label: "规格" },
+      { key: "引入状态", label: "引入状态" },
+      { key: "状态", label: "状态" },
+      { key: "厂商", label: "厂商" },
+      { key: "容量", label: "容量" },
+      { key: "盘体尺寸", label: "盘体尺寸" },
+      { key: "物理接口", label: "物理接口" },
+      { key: "接口速度(Gb/s)", label: "接口速度(Gb/s)" },
+      { key: "顺序读(MB/s)", label: "顺序读(MB/s)" },
+      { key: "顺序写(MB/s)", label: "顺序写(MB/s)" },
+      { key: "最大功耗(W)", label: "最大功耗(W)" },
+    ],
+  },
+  NVME: {
+    icon: HardDrive,
+    color: "bg-slate-50 dark:bg-slate-800/50",
     fields: [
       { key: "规格", label: "规格" },
       { key: "引入状态", label: "引入状态" },
@@ -80,7 +114,7 @@ const hardwareCategories = {
   },
   GPU: {
     icon: Zap,
-    color: "bg-purple-50 dark:bg-purple-900/20",
+    color: "bg-slate-50 dark:bg-slate-800/50",
     fields: [
       { key: "规格", label: "规格" },
       { key: "引入状态", label: "引入状态" },
@@ -92,22 +126,6 @@ const hardwareCategories = {
       { key: "link宽度", label: "Link宽度" },
       { key: "是否带桥接接口", label: "是否带桥接接口" },
       { key: "最大功耗(W)", label: "最大功耗(W)" },
-    ],
-  },
-  RAID: {
-    icon: Server,
-    color: "bg-cyan-50 dark:bg-cyan-900/20",
-    fields: [
-      { key: "规格", label: "规格" },
-      { key: "引入状态", label: "引入状态" },
-      { key: "状态", label: "状态" },
-      { key: "厂商", label: "厂商" },
-      { key: "raid卡类型", label: "RAID卡类型" },
-      { key: "支持raid类型", label: "支持RAID类型" },
-      { key: "接口类型", label: "接口类型" },
-      { key: "接口数量", label: "接口数量" },
-      { key: "内置盘口", label: "内置盘口" },
-      { key: "缓存容量", label: "缓存容量" },
     ],
   },
 };
@@ -222,19 +240,37 @@ const HardwareRequirements = () => {
                 className="pl-9 h-9"
               />
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-              {filteredCustomers.map((customer) => (
+            {searchTerm && filteredCustomers.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {filteredCustomers.map((customer) => (
+                  <Button
+                    key={customer}
+                    variant={selectedCustomer === customer ? "default" : "outline"}
+                    onClick={() => {
+                      setSelectedCustomer(customer);
+                      setSearchTerm("");
+                    }}
+                    className="justify-start h-9"
+                    size="sm"
+                  >
+                    {customer}
+                  </Button>
+                ))}
+              </div>
+            )}
+            {selectedCustomer && (
+              <div className="flex items-center justify-between p-3 bg-muted/30 rounded-md border">
+                <span className="text-sm font-medium">{selectedCustomer}</span>
                 <Button
-                  key={customer}
-                  variant={selectedCustomer === customer ? "default" : "outline"}
-                  onClick={() => setSelectedCustomer(customer)}
-                  className="justify-start h-9"
+                  variant="ghost"
                   size="sm"
+                  onClick={() => setSelectedCustomer("")}
+                  className="h-7 px-2 text-xs"
                 >
-                  {customer}
+                  更换客户
                 </Button>
-              ))}
-            </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -248,7 +284,7 @@ const HardwareRequirements = () => {
               </CardHeader>
               <CardContent>
                 <Tabs value={selectedCategory} onValueChange={(v) => setSelectedCategory(v as keyof typeof hardwareCategories)}>
-                  <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 bg-muted/50">
+                  <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 bg-muted/50">
                     {Object.entries(hardwareCategories).map(([key, config]) => {
                       const Icon = config.icon;
                       return (

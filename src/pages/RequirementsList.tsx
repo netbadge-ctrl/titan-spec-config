@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Search, Settings, Eye, Trash2 } from "lucide-react";
+import { Plus, Search, Settings, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +13,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 // 模拟数据
 const mockCustomerRequirements = [
@@ -48,10 +66,29 @@ const mockCustomerRequirements = [
 const RequirementsList = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const itemsPerPage = 10;
 
   const filteredData = mockCustomerRequirements.filter((item) =>
     item.customerName.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handleDelete = (id: string) => {
+    setDeleteId(id);
+  };
+
+  const confirmDelete = () => {
+    // 这里实现删除逻辑
+    console.log("删除配置:", deleteId);
+    setDeleteId(null);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -79,7 +116,7 @@ const RequirementsList = () => {
           <CardHeader className="pb-3">
             <CardTitle className="text-base">客户列表</CardTitle>
             <CardDescription className="text-sm">
-              共 {filteredData.length} 个客户配置
+              共 {filteredData.length} 个客户配置，第 {currentPage} / {totalPages} 页
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -99,29 +136,23 @@ const RequirementsList = () => {
                 <TableHeader>
                   <TableRow className="bg-muted/50">
                     <TableHead className="w-[200px]">客户名称</TableHead>
-                    <TableHead>配置数量</TableHead>
                     <TableHead>硬件类型</TableHead>
                     <TableHead>创建时间</TableHead>
                     <TableHead>更新时间</TableHead>
-                    <TableHead className="w-[120px] text-right">操作</TableHead>
+                    <TableHead className="w-[100px] text-right">操作</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredData.length === 0 ? (
+                  {paginatedData.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                         暂无数据
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredData.map((item) => (
+                    paginatedData.map((item) => (
                       <TableRow key={item.id} className="hover:bg-muted/30">
                         <TableCell className="font-medium">{item.customerName}</TableCell>
-                        <TableCell>
-                          <Badge variant="secondary" className="font-normal">
-                            {item.requirementsCount} 条
-                          </Badge>
-                        </TableCell>
                         <TableCell>
                           <div className="flex gap-1 flex-wrap">
                             {item.categories.map((cat) => (
@@ -143,14 +174,6 @@ const RequirementsList = () => {
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8"
-                              onClick={() => navigate(`/requirements/view/${item.id}`)}
-                            >
-                              <Eye className="h-3.5 w-3.5" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
                               onClick={() => navigate(`/requirements/edit/${item.id}`)}
                             >
                               <Settings className="h-3.5 w-3.5" />
@@ -159,6 +182,7 @@ const RequirementsList = () => {
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8 text-destructive hover:text-destructive"
+                              onClick={() => handleDelete(item.id)}
                             >
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>
@@ -170,35 +194,60 @@ const RequirementsList = () => {
                 </TableBody>
               </Table>
             </div>
+
+            {/* 分页 */}
+            {totalPages > 1 && (
+              <div className="mt-4 flex justify-center">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      />
+                    </PaginationItem>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(page)}
+                          isActive={currentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
           </CardContent>
         </Card>
-
-        {/* 统计信息 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="shadow-sm border">
-            <CardHeader className="pb-2">
-              <CardDescription className="text-xs">总配置客户</CardDescription>
-              <CardTitle className="text-2xl">{mockCustomerRequirements.length}</CardTitle>
-            </CardHeader>
-          </Card>
-          <Card className="shadow-sm border">
-            <CardHeader className="pb-2">
-              <CardDescription className="text-xs">总配置项</CardDescription>
-              <CardTitle className="text-2xl">
-                {mockCustomerRequirements.reduce((sum, item) => sum + item.requirementsCount, 0)}
-              </CardTitle>
-            </CardHeader>
-          </Card>
-          <Card className="shadow-sm border">
-            <CardHeader className="pb-2">
-              <CardDescription className="text-xs">最近更新</CardDescription>
-              <CardTitle className="text-sm font-normal text-muted-foreground">
-                {mockCustomerRequirements[0]?.updateTime || "-"}
-              </CardTitle>
-            </CardHeader>
-          </Card>
-        </div>
       </div>
+
+      {/* 删除确认对话框 */}
+      <AlertDialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认删除</AlertDialogTitle>
+            <AlertDialogDescription>
+              此操作将永久删除该客户的硬件性能指标配置，此操作不可撤销。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              确认删除
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
