@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Search, Plus, Trash2, Edit, Server, Cpu, HardDrive, Database, Zap, Network } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Search, Plus, Trash2, Edit, Server, Cpu, HardDrive, Database, Zap, Network, ArrowLeft, Save } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -120,6 +121,8 @@ type Requirement = {
 };
 
 const HardwareRequirements = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<keyof typeof hardwareCategories>("CPU");
@@ -167,12 +170,37 @@ const HardwareRequirements = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-6 max-w-7xl">
-        {/* 页面标题 */}
+        {/* 页面标题和返回按钮 */}
         <div className="mb-6 border-b border-border pb-4">
-          <h1 className="text-2xl font-semibold text-foreground mb-1">
-            硬件性能指标管理
-          </h1>
-          <p className="text-sm text-muted-foreground">IDC项目交付服务器硬件性能最低要求配置</p>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate("/")}
+                className="h-8 w-8"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <div>
+                <h1 className="text-2xl font-semibold text-foreground mb-1">
+                  {id ? "编辑" : "新建"}硬件性能指标配置
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  为客户配置服务器硬件性能最低要求
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => navigate("/")}>
+                取消
+              </Button>
+              <Button size="sm">
+                <Save className="h-3.5 w-3.5 mr-1.5" />
+                保存配置
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* 客户选择 */}
