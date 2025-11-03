@@ -279,89 +279,94 @@ const HardwareRequirements = () => {
             {/* 硬件类型选择 */}
             <Card className="mb-6 shadow-sm border">
               <CardHeader>
-                <CardTitle className="text-base">硬件类型选择</CardTitle>
+                <CardTitle className="text-base">选择硬件类型</CardTitle>
                 <CardDescription className="text-sm">为 {selectedCustomer} 配置硬件性能指标</CardDescription>
               </CardHeader>
               <CardContent>
-                <Tabs value={selectedCategory} onValueChange={(v) => setSelectedCategory(v as keyof typeof hardwareCategories)}>
-                  <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 bg-muted/50">
-                    {Object.entries(hardwareCategories).map(([key, config]) => {
-                      const Icon = config.icon;
-                      return (
-                        <TabsTrigger key={key} value={key} className="gap-1.5 text-sm">
-                          <Icon className="h-3.5 w-3.5" />
-                          <span className="hidden sm:inline">{key}</span>
-                        </TabsTrigger>
-                      );
-                    })}
-                  </TabsList>
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
+                  {Object.entries(hardwareCategories).map(([key, config]) => {
+                    const Icon = config.icon;
+                    const isSelected = selectedCategory === key;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => setSelectedCategory(key as keyof typeof hardwareCategories)}
+                        className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                          isSelected
+                            ? 'border-primary bg-primary/5 shadow-sm'
+                            : 'border-border bg-card hover:border-primary/50 hover:bg-accent/5'
+                        }`}
+                      >
+                        <Icon className={`h-5 w-5 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
+                        <span className={`text-sm font-medium ${isSelected ? 'text-primary' : 'text-foreground'}`}>
+                          {key}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
 
-                  {Object.keys(hardwareCategories).map((key) => (
-                    <TabsContent key={key} value={key} className="mt-4">
-                      <Card className={`border ${hardwareCategories[key as keyof typeof hardwareCategories].color}`}>
-                        <CardHeader className="pb-3">
-                          <CardTitle className="flex items-center gap-2 text-sm font-medium">
-                            <CategoryIcon className="h-4 w-4 text-muted-foreground" />
-                            添加 {key} 性能指标
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="pt-0">
-                          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                            <div className="space-y-1.5">
-                              <Label className="text-xs text-muted-foreground">字段</Label>
-                              <Select value={selectedField} onValueChange={setSelectedField}>
-                                <SelectTrigger className="h-9">
-                                  <SelectValue placeholder="选择字段" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {hardwareCategories[key as keyof typeof hardwareCategories].fields.map((field) => (
-                                    <SelectItem key={field.key} value={field.key}>
-                                      {field.label}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
+                <Card className={`border ${hardwareCategories[selectedCategory].color}`}>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-sm font-medium">
+                      <CategoryIcon className="h-4 w-4 text-primary" />
+                      添加 {selectedCategory} 性能指标
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs text-muted-foreground">字段</Label>
+                        <Select value={selectedField} onValueChange={setSelectedField}>
+                          <SelectTrigger className="h-9">
+                            <SelectValue placeholder="选择字段" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {hardwareCategories[selectedCategory].fields.map((field) => (
+                              <SelectItem key={field.key} value={field.key}>
+                                {field.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-                            <div className="space-y-1.5">
-                              <Label className="text-xs text-muted-foreground">条件</Label>
-                              <Select value={operator} onValueChange={setOperator}>
-                                <SelectTrigger className="h-9">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value=">=">&gt;=</SelectItem>
-                                  <SelectItem value="<=">&lt;=</SelectItem>
-                                  <SelectItem value="=">=</SelectItem>
-                                  <SelectItem value=">>">&gt;</SelectItem>
-                                  <SelectItem value="<">&lt;</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs text-muted-foreground">条件</Label>
+                        <Select value={operator} onValueChange={setOperator}>
+                          <SelectTrigger className="h-9">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value=">=">&gt;=</SelectItem>
+                            <SelectItem value="<=">&lt;=</SelectItem>
+                            <SelectItem value="=">=</SelectItem>
+                            <SelectItem value=">>">&gt;</SelectItem>
+                            <SelectItem value="<">&lt;</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-                            <div className="space-y-1.5">
-                              <Label className="text-xs text-muted-foreground">数值</Label>
-                              <Input
-                                placeholder="输入数值"
-                                value={value}
-                                onChange={(e) => setValue(e.target.value)}
-                                className="h-9"
-                              />
-                            </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs text-muted-foreground">数值</Label>
+                        <Input
+                          placeholder="输入数值"
+                          value={value}
+                          onChange={(e) => setValue(e.target.value)}
+                          className="h-9"
+                        />
+                      </div>
 
-                            <div className="space-y-1.5">
-                              <Label className="invisible text-xs">操作</Label>
-                              <Button onClick={handleAddRequirement} className="w-full h-9" size="sm">
-                                <Plus className="h-3.5 w-3.5 mr-1.5" />
-                                添加
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </TabsContent>
-                  ))}
-                </Tabs>
+                      <div className="space-y-1.5">
+                        <Label className="invisible text-xs">操作</Label>
+                        <Button onClick={handleAddRequirement} className="w-full h-9" size="sm">
+                          <Plus className="h-3.5 w-3.5 mr-1.5" />
+                          添加
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </CardContent>
             </Card>
 
