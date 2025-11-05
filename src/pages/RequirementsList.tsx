@@ -106,7 +106,7 @@ const RequirementsList = () => {
             </div>
             <Button onClick={() => navigate("/requirements/new")} size="sm">
               <Plus className="h-4 w-4 mr-1.5" />
-              新建配置
+              新建客户性能指标要求
             </Button>
           </div>
         </div>
@@ -117,6 +117,8 @@ const RequirementsList = () => {
             <CardTitle className="text-base">客户列表</CardTitle>
             <CardDescription className="text-sm">
               共 {filteredData.length} 个客户配置，第 {currentPage} / {totalPages} 页
+              <br />
+              <span className="text-xs text-muted-foreground">同一客户仅支持一套性能指标</span>
             </CardDescription>
           </CardHeader>
           <CardContent>
