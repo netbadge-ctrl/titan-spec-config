@@ -332,7 +332,8 @@ const HardwareRequirements = () => {
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {/* 字段、条件、数值（如果是数值型） */}
+                      <div className={`grid gap-3 ${currentField?.type === "numeric" ? "grid-cols-1 md:grid-cols-3" : "grid-cols-1 md:grid-cols-2"}`}>
                         <div className="space-y-1.5">
                           <Label className="text-xs text-muted-foreground">字段</Label>
                           <Select value={selectedField} onValueChange={handleFieldChange}>
@@ -361,46 +362,44 @@ const HardwareRequirements = () => {
                             </SelectContent>
                           </Select>
                         </div>
+
+                        {selectedField && currentField?.type === "numeric" && (
+                          <div className="space-y-1.5">
+                            <Label className="text-xs text-muted-foreground">数值</Label>
+                            <Input
+                              placeholder="输入数值"
+                              value={value}
+                              onChange={(e) => setValue(e.target.value)}
+                              className="h-9"
+                              type="number"
+                            />
+                          </div>
+                        )}
                       </div>
 
-                      {/* 数值输入或枚举多选 */}
-                      {selectedField && currentField && (
+                      {/* 枚举多选 */}
+                      {selectedField && currentField?.type === "enum" && (
                         <div className="space-y-2">
-                          {currentField.type === "numeric" ? (
-                            <div className="space-y-1.5">
-                              <Label className="text-xs text-muted-foreground">数值</Label>
-                              <Input
-                                placeholder="输入数值"
-                                value={value}
-                                onChange={(e) => setValue(e.target.value)}
-                                className="h-9"
-                                type="number"
-                              />
-                            </div>
-                          ) : (
-                            <div className="space-y-2">
-                              <Label className="text-xs text-muted-foreground">
-                                选择选项（多选，选中项为"或"关系）
-                              </Label>
-                              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                                {currentField.enumValues?.map((enumValue) => (
-                                  <div
-                                    key={enumValue}
-                                    className="flex items-center space-x-2 p-2 rounded-md border bg-card hover:bg-accent/5 cursor-pointer"
-                                    onClick={() => handleEnumValueToggle(enumValue)}
-                                  >
-                                    <Checkbox
-                                      checked={selectedEnumValues.includes(enumValue)}
-                                      onCheckedChange={() => handleEnumValueToggle(enumValue)}
-                                    />
-                                    <label className="text-sm cursor-pointer flex-1">
-                                      {enumValue}
-                                    </label>
-                                  </div>
-                                ))}
+                          <Label className="text-xs text-muted-foreground">
+                            选择选项（多选，选中项为"或"关系）
+                          </Label>
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            {currentField.enumValues?.map((enumValue) => (
+                              <div
+                                key={enumValue}
+                                className="flex items-center space-x-2 p-2 rounded-md border bg-card hover:bg-accent/5 cursor-pointer"
+                                onClick={() => handleEnumValueToggle(enumValue)}
+                              >
+                                <Checkbox
+                                  checked={selectedEnumValues.includes(enumValue)}
+                                  onCheckedChange={() => handleEnumValueToggle(enumValue)}
+                                />
+                                <label className="text-sm cursor-pointer flex-1">
+                                  {enumValue}
+                                </label>
                               </div>
-                            </div>
-                          )}
+                            ))}
+                          </div>
                         </div>
                       )}
 
