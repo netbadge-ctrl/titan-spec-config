@@ -93,8 +93,9 @@ type Requirement = {
 const HardwareRequirements = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const isEditMode = !!id;
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState(isEditMode ? "腾讯云" : "");
   const [selectedCategory, setSelectedCategory] = useState<keyof typeof hardwareCategories>("内存");
   const [selectedField, setSelectedField] = useState("");
   const [operator, setOperator] = useState(">=");
@@ -222,58 +223,73 @@ const HardwareRequirements = () => {
           </div>
         </div>
 
-        {/* 客户选择 */}
-        <Card className="mb-6 shadow-sm border">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Search className="h-4 w-4 text-muted-foreground" />
-              客户选择
-            </CardTitle>
-            <CardDescription className="text-sm">搜索并选择需要配置的客户</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="输入客户名称进行搜索..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 h-9"
-              />
-            </div>
-            {searchTerm && filteredCustomers.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {filteredCustomers.map((customer) => (
-                  <Button
-                    key={customer}
-                    variant={selectedCustomer === customer ? "default" : "outline"}
-                    onClick={() => {
-                      setSelectedCustomer(customer);
-                      setSearchTerm("");
-                    }}
-                    className="justify-start h-9"
-                    size="sm"
-                  >
-                    {customer}
-                  </Button>
-                ))}
-              </div>
-            )}
-            {selectedCustomer && (
+        {/* 客户选择或显示 */}
+        {isEditMode ? (
+          <Card className="mb-6 shadow-sm border">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                客户信息
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
               <div className="flex items-center justify-between p-3 bg-muted/30 rounded-md border">
                 <span className="text-sm font-medium">{selectedCustomer}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedCustomer("")}
-                  className="h-7 px-2 text-xs"
-                >
-                  更换客户
-                </Button>
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="mb-6 shadow-sm border">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Search className="h-4 w-4 text-muted-foreground" />
+                客户选择
+              </CardTitle>
+              <CardDescription className="text-sm">搜索并选择需要配置的客户</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="输入客户名称进行搜索..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9 h-9"
+                />
+              </div>
+              {searchTerm && filteredCustomers.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {filteredCustomers.map((customer) => (
+                    <Button
+                      key={customer}
+                      variant={selectedCustomer === customer ? "default" : "outline"}
+                      onClick={() => {
+                        setSelectedCustomer(customer);
+                        setSearchTerm("");
+                      }}
+                      className="justify-start h-9"
+                      size="sm"
+                    >
+                      {customer}
+                    </Button>
+                  ))}
+                </div>
+              )}
+              {selectedCustomer && (
+                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-md border">
+                  <span className="text-sm font-medium">{selectedCustomer}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedCustomer("")}
+                    className="h-7 px-2 text-xs"
+                  >
+                    更换客户
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {selectedCustomer && (
           <>
