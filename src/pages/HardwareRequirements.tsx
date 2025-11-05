@@ -208,15 +208,6 @@ const HardwareRequirements = () => {
                 </p>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => navigate("/")}>
-                取消
-              </Button>
-              <Button size="sm">
-                <Save className="h-3.5 w-3.5 mr-1.5" />
-                保存配置
-              </Button>
-            </div>
           </div>
         </div>
 
@@ -457,6 +448,19 @@ const HardwareRequirements = () => {
               </Card>
             )}
           </>
+        )}
+
+        {/* 底部操作按钮 */}
+        {selectedCustomer && (
+          <div className="flex justify-end gap-2 mt-6 pt-6 border-t border-border">
+            <Button variant="outline" onClick={() => navigate("/")}>
+              取消
+            </Button>
+            <Button>
+              <Save className="h-4 w-4 mr-2" />
+              保存配置
+            </Button>
+          </div>
         )}
       </div>
     </div>
