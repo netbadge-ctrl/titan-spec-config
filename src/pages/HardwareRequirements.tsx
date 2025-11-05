@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Search, Plus, Trash2, Edit, Server, Cpu, HardDrive, Database, Zap, Network, ArrowLeft, Save } from "lucide-react";
+import { Search, Plus, Trash2, Server, Cpu, HardDrive, Database, Zap, Network, ArrowLeft, Save } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,17 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 // 字段类型定义
 type FieldType = "numeric" | "enum";
@@ -403,7 +414,6 @@ const HardwareRequirements = () => {
                   <div className="space-y-2">
                     {requirements.map((req) => {
                       const CategoryIcon = hardwareCategories[req.category as keyof typeof hardwareCategories].icon;
-                      const colorClass = hardwareCategories[req.category as keyof typeof hardwareCategories].color;
                       
                       return (
                         <div
@@ -411,35 +421,43 @@ const HardwareRequirements = () => {
                           className="flex items-center justify-between p-3 rounded-md border bg-card hover:bg-accent/5 transition-colors"
                         >
                           <div className="flex items-center gap-3 flex-1">
-                            <div className={`p-1.5 rounded ${colorClass} border`}>
-                              <CategoryIcon className="h-4 w-4 text-muted-foreground" />
-                            </div>
-                            <div className="flex-1">
-                              <Badge variant="secondary" className="mb-1 text-xs font-normal">
-                                {req.category}
-                              </Badge>
-                              <p className="text-sm text-foreground">
-                                {req.field} {req.operator}{" "}
-                                {Array.isArray(req.value) 
-                                  ? req.value.join(" 或 ")
-                                  : req.value
-                                }
-                              </p>
-                            </div>
+                            <CategoryIcon className="h-4 w-4 text-muted-foreground" />
+                            <Badge variant="secondary" className="text-xs font-normal">
+                              {req.category}
+                            </Badge>
+                            <span className="text-sm text-foreground">
+                              {req.field} {req.operator}{" "}
+                              {Array.isArray(req.value) 
+                                ? req.value.join(" 或 ")
+                                : req.value
+                              }
+                            </span>
                           </div>
-                          <div className="flex gap-1">
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <Edit className="h-3.5 w-3.5" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => handleDeleteRequirement(req.id)}
-                            >
-                              <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                            </Button>
-                          </div>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                              >
+                                <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>确认删除</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  确定要删除该性能指标配置吗？此操作无法撤销。
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>取消</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDeleteRequirement(req.id)}>
+                                  删除
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       );
                     })}
