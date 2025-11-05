@@ -406,6 +406,8 @@ const HardwareRequirements = () => {
                   <CardTitle className="text-base">已配置的性能指标</CardTitle>
                   <CardDescription className="text-sm">
                     客户: {selectedCustomer} | 共 {requirements.length} 条配置
+                    <br />
+                    <span className="text-xs text-muted-foreground">指标条件为且的关系，需要同时满足</span>
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
