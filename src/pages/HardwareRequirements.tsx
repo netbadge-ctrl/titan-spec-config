@@ -11,121 +11,51 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // 硬件类别及其字段配置
 const hardwareCategories = {
-  CPU: {
-    icon: Cpu,
-    color: "bg-slate-50 dark:bg-slate-800/50",
-    fields: [
-      { key: "规格", label: "规格" },
-      { key: "引入状态", label: "引入状态" },
-      { key: "状态", label: "状态" },
-      { key: "厂", label: "厂商" },
-      { key: "架构", label: "架构" },
-      { key: "内核数", label: "内核数" },
-      { key: "线程数", label: "线程数" },
-      { key: "睿频(GHz)", label: "睿频(GHz)" },
-      { key: "基频(GHz)", label: "基频(GHz)" },
-      { key: "内存类型", label: "内存类型" },
-      { key: "最大功耗(W)", label: "最大功耗(W)" },
-    ],
-  },
   内存: {
     icon: Database,
     color: "bg-slate-50 dark:bg-slate-800/50",
     fields: [
-      { key: "规格", label: "规格" },
-      { key: "引入状态", label: "引入状态" },
-      { key: "状态", label: "状态" },
-      { key: "厂商", label: "厂商" },
       { key: "容量(GB)", label: "容量(GB)" },
       { key: "Speed(Mbps)", label: "Speed(Mbps)" },
-      { key: "ddr", label: "DDR类型" },
-      { key: "DIMM类型", label: "DIMM类型" },
-      { key: "Rank", label: "Rank" },
-      { key: "最大功耗(W)", label: "最大功耗(W)" },
+      { key: "硬件版本", label: "硬件版本" },
     ],
   },
   网卡: {
     icon: Network,
     color: "bg-slate-50 dark:bg-slate-800/50",
     fields: [
-      { key: "规格", label: "规格" },
-      { key: "引入状态", label: "引入状态" },
-      { key: "状态", label: "状态" },
-      { key: "厂商", label: "厂商" },
-      { key: "link类型", label: "Link类型" },
-      { key: "link宽度", label: "Link宽度" },
-      { key: "介质类型", label: "介质类型" },
-      { key: "模块类型", label: "模块类型" },
-      { key: "电口数量", label: "电口数量" },
-      { key: "光口数量", label: "光口数量" },
-      { key: "最大功耗(W)", label: "最大功耗(W)" },
+      { key: "硬件版本", label: "硬件版本" },
     ],
   },
   HDD: {
     icon: HardDrive,
     color: "bg-slate-50 dark:bg-slate-800/50",
     fields: [
-      { key: "规格", label: "规格" },
-      { key: "引入状态", label: "引入状态" },
-      { key: "状态", label: "状态" },
-      { key: "厂商", label: "厂商" },
       { key: "容量", label: "容量" },
-      { key: "盘体尺寸", label: "盘体尺寸" },
-      { key: "物理接口", label: "物理接口" },
-      { key: "接口速度(Gb/s)", label: "接口速度(Gb/s)" },
-      { key: "顺序读(MB/s)", label: "顺序读(MB/s)" },
-      { key: "顺序写(MB/s)", label: "顺序写(MB/s)" },
-      { key: "最大功耗(W)", label: "最大功耗(W)" },
+      { key: "接口速率(Gb/s)", label: "接口速率(Gb/s)" },
+      { key: "硬件版本", label: "硬件版本" },
     ],
   },
   SSD: {
     icon: HardDrive,
     color: "bg-slate-50 dark:bg-slate-800/50",
     fields: [
-      { key: "规格", label: "规格" },
-      { key: "引入状态", label: "引入状态" },
-      { key: "状态", label: "状态" },
-      { key: "厂商", label: "厂商" },
       { key: "容量", label: "容量" },
-      { key: "盘体尺寸", label: "盘体尺寸" },
-      { key: "物理接口", label: "物理接口" },
-      { key: "接口速度(Gb/s)", label: "接口速度(Gb/s)" },
-      { key: "顺序读(MB/s)", label: "顺序读(MB/s)" },
-      { key: "顺序写(MB/s)", label: "顺序写(MB/s)" },
-      { key: "最大功耗(W)", label: "最大功耗(W)" },
+      { key: "接口速率(Gb/s)", label: "接口速率(Gb/s)" },
+      { key: "颗粒类型", label: "颗粒类型" },
+      { key: "耐用等级(DEPD)", label: "耐用等级(DEPD)" },
+      { key: "硬件版本", label: "硬件版本" },
     ],
   },
   NVME: {
     icon: HardDrive,
     color: "bg-slate-50 dark:bg-slate-800/50",
     fields: [
-      { key: "规格", label: "规格" },
-      { key: "引入状态", label: "引入状态" },
-      { key: "状态", label: "状态" },
-      { key: "厂商", label: "厂商" },
       { key: "容量", label: "容量" },
-      { key: "盘体尺寸", label: "盘体尺寸" },
-      { key: "物理接口", label: "物理接口" },
-      { key: "接口速度(Gb/s)", label: "接口速度(Gb/s)" },
-      { key: "顺序读(MB/s)", label: "顺序读(MB/s)" },
-      { key: "顺序写(MB/s)", label: "顺序写(MB/s)" },
-      { key: "最大功耗(W)", label: "最大功耗(W)" },
-    ],
-  },
-  GPU: {
-    icon: Zap,
-    color: "bg-slate-50 dark:bg-slate-800/50",
-    fields: [
-      { key: "规格", label: "规格" },
-      { key: "引入状态", label: "引入状态" },
-      { key: "状态", label: "状态" },
-      { key: "厂商", label: "厂商" },
-      { key: "显存容量", label: "显存容量" },
-      { key: "显存类型", label: "显存类型" },
-      { key: "link类型", label: "Link类型" },
-      { key: "link宽度", label: "Link宽度" },
-      { key: "是否带桥接接口", label: "是否带桥接接口" },
-      { key: "最大功耗(W)", label: "最大功耗(W)" },
+      { key: "接口速率(Gb/s)", label: "接口速率(Gb/s)" },
+      { key: "颗粒类型", label: "颗粒类型" },
+      { key: "耐用等级", label: "耐用等级" },
+      { key: "硬件版本", label: "硬件版本" },
     ],
   },
 };
@@ -143,7 +73,7 @@ const HardwareRequirements = () => {
   const { id } = useParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<keyof typeof hardwareCategories>("CPU");
+  const [selectedCategory, setSelectedCategory] = useState<keyof typeof hardwareCategories>("内存");
   const [selectedField, setSelectedField] = useState("");
   const [operator, setOperator] = useState(">=");
   const [value, setValue] = useState("");
