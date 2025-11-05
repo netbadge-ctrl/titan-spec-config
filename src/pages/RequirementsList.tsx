@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Search, Settings, Trash2 } from "lucide-react";
+import { Plus, Search, Edit, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,7 +40,7 @@ const mockCustomerRequirements = [
     createTime: "2024-01-15 10:30:00",
     updateTime: "2024-01-20 14:25:00",
     requirementsCount: 8,
-    categories: ["CPU", "Memory", "Storage"],
+    categories: ["内存", "HDD", "SSD"],
     status: "active",
   },
   {
@@ -49,7 +49,7 @@ const mockCustomerRequirements = [
     createTime: "2024-01-18 09:15:00",
     updateTime: "2024-01-18 09:15:00",
     requirementsCount: 5,
-    categories: ["CPU", "GPU"],
+    categories: ["内存", "网卡"],
     status: "active",
   },
   {
@@ -58,7 +58,7 @@ const mockCustomerRequirements = [
     createTime: "2024-01-10 16:45:00",
     updateTime: "2024-01-22 11:30:00",
     requirementsCount: 12,
-    categories: ["CPU", "Memory", "NIC", "Storage", "RAID"],
+    categories: ["内存", "网卡", "HDD", "SSD", "NVME"],
     status: "active",
   },
 ];
@@ -98,10 +98,10 @@ const RequirementsList = () => {
           <div className="flex items-center justify-between mb-2">
             <div>
               <h1 className="text-2xl font-semibold text-foreground mb-1">
-                硬件性能指标管理
+                已配置交付性能指标的客户
               </h1>
               <p className="text-sm text-muted-foreground">
-                管理客户的服务器硬件性能最低要求配置
+                管理已配置硬件性能指标的客户列表
               </p>
             </div>
             <Button onClick={() => navigate("/requirements/new")} size="sm">
@@ -176,7 +176,7 @@ const RequirementsList = () => {
                               className="h-8 w-8"
                               onClick={() => navigate(`/requirements/edit/${item.id}`)}
                             >
-                              <Settings className="h-3.5 w-3.5" />
+                              <Edit className="h-3.5 w-3.5" />
                             </Button>
                             <Button
                               variant="ghost"
