@@ -332,7 +332,7 @@ const HardwareRequirements = () => {
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div className="space-y-1.5">
                           <Label className="text-xs text-muted-foreground">字段</Label>
                           <Select value={selectedField} onValueChange={handleFieldChange}>
@@ -360,14 +360,6 @@ const HardwareRequirements = () => {
                               <SelectItem value="=">=</SelectItem>
                             </SelectContent>
                           </Select>
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <Label className="invisible text-xs">操作</Label>
-                          <Button onClick={handleAddRequirement} className="w-full h-9" size="sm">
-                            <Plus className="h-3.5 w-3.5 mr-1.5" />
-                            添加指标
-                          </Button>
                         </div>
                       </div>
 
@@ -410,6 +402,14 @@ const HardwareRequirements = () => {
                             </div>
                           )}
                         </div>
+                      )}
+
+                      {/* 添加指标按钮 */}
+                      {selectedField && (
+                        <Button onClick={handleAddRequirement} className="w-full h-9" size="sm">
+                          <Plus className="h-3.5 w-3.5 mr-1.5" />
+                          添加指标
+                        </Button>
                       )}
                     </div>
                   </CardContent>
