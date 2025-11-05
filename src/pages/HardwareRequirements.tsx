@@ -7,7 +7,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "@/hooks/use-toast";
+
+// 字段类型定义
+type FieldType = "numeric" | "enum";
+
+type Field = {
+  key: string;
+  label: string;
+  type: FieldType;
+  enumValues?: string[];
+};
 
 // 硬件类别及其字段配置
 const hardwareCategories = {
@@ -15,47 +26,47 @@ const hardwareCategories = {
     icon: Database,
     color: "bg-slate-50 dark:bg-slate-800/50",
     fields: [
-      { key: "容量(GB)", label: "容量(GB)" },
-      { key: "Speed(Mbps)", label: "Speed(Mbps)" },
-      { key: "硬件版本", label: "硬件版本" },
+      { key: "容量(GB)", label: "容量(GB)", type: "numeric" as FieldType },
+      { key: "Speed(Mbps)", label: "Speed(Mbps)", type: "numeric" as FieldType },
+      { key: "硬件版本", label: "硬件版本", type: "enum" as FieldType, enumValues: ["DDR3", "DDR4", "DDR5"] },
     ],
   },
   网卡: {
     icon: Network,
     color: "bg-slate-50 dark:bg-slate-800/50",
     fields: [
-      { key: "硬件版本", label: "硬件版本" },
+      { key: "硬件版本", label: "硬件版本", type: "enum" as FieldType, enumValues: ["1GbE", "10GbE", "25GbE", "40GbE", "100GbE"] },
     ],
   },
   HDD: {
     icon: HardDrive,
     color: "bg-slate-50 dark:bg-slate-800/50",
     fields: [
-      { key: "容量", label: "容量" },
-      { key: "接口速率(Gb/s)", label: "接口速率(Gb/s)" },
-      { key: "硬件版本", label: "硬件版本" },
+      { key: "容量", label: "容量", type: "numeric" as FieldType },
+      { key: "接口速率(Gb/s)", label: "接口速率(Gb/s)", type: "numeric" as FieldType },
+      { key: "硬件版本", label: "硬件版本", type: "enum" as FieldType, enumValues: ["SATA2", "SATA3", "SAS"] },
     ],
   },
   SSD: {
     icon: HardDrive,
     color: "bg-slate-50 dark:bg-slate-800/50",
     fields: [
-      { key: "容量", label: "容量" },
-      { key: "接口速率(Gb/s)", label: "接口速率(Gb/s)" },
-      { key: "颗粒类型", label: "颗粒类型" },
-      { key: "耐用等级(DEPD)", label: "耐用等级(DEPD)" },
-      { key: "硬件版本", label: "硬件版本" },
+      { key: "容量", label: "容量", type: "numeric" as FieldType },
+      { key: "接口速率(Gb/s)", label: "接口速率(Gb/s)", type: "numeric" as FieldType },
+      { key: "颗粒类型", label: "颗粒类型", type: "enum" as FieldType, enumValues: ["SLC", "MLC", "TLC", "QLC"] },
+      { key: "耐用等级(DEPD)", label: "耐用等级(DEPD)", type: "numeric" as FieldType },
+      { key: "硬件版本", label: "硬件版本", type: "enum" as FieldType, enumValues: ["SATA3", "SAS"] },
     ],
   },
   NVME: {
     icon: HardDrive,
     color: "bg-slate-50 dark:bg-slate-800/50",
     fields: [
-      { key: "容量", label: "容量" },
-      { key: "接口速率(Gb/s)", label: "接口速率(Gb/s)" },
-      { key: "颗粒类型", label: "颗粒类型" },
-      { key: "耐用等级", label: "耐用等级" },
-      { key: "硬件版本", label: "硬件版本" },
+      { key: "容量", label: "容量", type: "numeric" as FieldType },
+      { key: "接口速率(Gb/s)", label: "接口速率(Gb/s)", type: "numeric" as FieldType },
+      { key: "颗粒类型", label: "颗粒类型", type: "enum" as FieldType, enumValues: ["SLC", "MLC", "TLC", "QLC"] },
+      { key: "耐用等级", label: "耐用等级", type: "numeric" as FieldType },
+      { key: "硬件版本", label: "硬件版本", type: "enum" as FieldType, enumValues: ["PCIe 3.0", "PCIe 4.0", "PCIe 5.0"] },
     ],
   },
 };
@@ -65,7 +76,7 @@ type Requirement = {
   category: string;
   field: string;
   operator: string;
-  value: string;
+  value: string | string[]; // 数值型为字符串，枚举型为字符串数组
 };
 
 const HardwareRequirements = () => {
@@ -77,7 +88,11 @@ const HardwareRequirements = () => {
   const [selectedField, setSelectedField] = useState("");
   const [operator, setOperator] = useState(">=");
   const [value, setValue] = useState("");
+  const [selectedEnumValues, setSelectedEnumValues] = useState<string[]>([]);
   const [requirements, setRequirements] = useState<Requirement[]>([]);
+
+  // 获取当前选中字段的配置
+  const currentField = hardwareCategories[selectedCategory].fields.find(f => f.key === selectedField);
 
   // 模拟客户数据
   const customers = [
@@ -94,19 +109,73 @@ const HardwareRequirements = () => {
   );
 
   const handleAddRequirement = () => {
-    if (!selectedCustomer || !selectedField || !value) return;
+    if (!selectedCustomer || !selectedField) return;
+
+    // 验证：数值型必须有值，枚举型必须有选中项
+    if (currentField?.type === "numeric" && !value.trim()) {
+      toast({
+        title: "请输入数值",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (currentField?.type === "enum" && selectedEnumValues.length === 0) {
+      toast({
+        title: "请至少选择一个选项",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // 验证：同一硬件类型的同一性能指标只能有一个条件
+    const existingRequirement = requirements.find(
+      req => req.category === selectedCategory && req.field === selectedField
+    );
+
+    if (existingRequirement) {
+      toast({
+        title: "该性能指标已存在",
+        description: "同一硬件类型的同一性能指标只能配置一次",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const newRequirement: Requirement = {
       id: Date.now().toString(),
       category: selectedCategory,
       field: selectedField,
-      operator,
-      value,
+      operator: currentField?.type === "numeric" ? ">=" : "=",
+      value: currentField?.type === "numeric" ? value : selectedEnumValues,
     };
 
     setRequirements([...requirements, newRequirement]);
     setSelectedField("");
     setValue("");
+    setSelectedEnumValues([]);
+  };
+
+  // 处理枚举值选择
+  const handleEnumValueToggle = (enumValue: string) => {
+    setSelectedEnumValues(prev => 
+      prev.includes(enumValue)
+        ? prev.filter(v => v !== enumValue)
+        : [...prev, enumValue]
+    );
+  };
+
+  // 当字段改变时，重置相关状态
+  const handleFieldChange = (fieldKey: string) => {
+    setSelectedField(fieldKey);
+    setValue("");
+    setSelectedEnumValues([]);
+    const field = hardwareCategories[selectedCategory].fields.find(f => f.key === fieldKey);
+    if (field?.type === "numeric") {
+      setOperator(">=");
+    } else {
+      setOperator("=");
+    }
   };
 
   const handleDeleteRequirement = (id: string) => {
@@ -244,56 +313,86 @@ const HardwareRequirements = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                      <div className="space-y-1.5">
-                        <Label className="text-xs text-muted-foreground">字段</Label>
-                        <Select value={selectedField} onValueChange={setSelectedField}>
-                          <SelectTrigger className="h-9">
-                            <SelectValue placeholder="选择字段" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {hardwareCategories[selectedCategory].fields.map((field) => (
-                              <SelectItem key={field.key} value={field.key}>
-                                {field.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground">字段</Label>
+                          <Select value={selectedField} onValueChange={handleFieldChange}>
+                            <SelectTrigger className="h-9">
+                              <SelectValue placeholder="选择字段" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {hardwareCategories[selectedCategory].fields.map((field) => (
+                                <SelectItem key={field.key} value={field.key}>
+                                  {field.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground">条件</Label>
+                          <Select value={operator} onValueChange={setOperator} disabled>
+                            <SelectTrigger className="h-9">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value=">=">&gt;=</SelectItem>
+                              <SelectItem value="=">=</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="invisible text-xs">操作</Label>
+                          <Button onClick={handleAddRequirement} className="w-full h-9" size="sm">
+                            <Plus className="h-3.5 w-3.5 mr-1.5" />
+                            添加指标
+                          </Button>
+                        </div>
                       </div>
 
-                      <div className="space-y-1.5">
-                        <Label className="text-xs text-muted-foreground">条件</Label>
-                        <Select value={operator} onValueChange={setOperator}>
-                          <SelectTrigger className="h-9">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value=">=">&gt;=</SelectItem>
-                            <SelectItem value="<=">&lt;=</SelectItem>
-                            <SelectItem value="=">=</SelectItem>
-                            <SelectItem value=">>">&gt;</SelectItem>
-                            <SelectItem value="<">&lt;</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <Label className="text-xs text-muted-foreground">数值</Label>
-                        <Input
-                          placeholder="输入数值"
-                          value={value}
-                          onChange={(e) => setValue(e.target.value)}
-                          className="h-9"
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <Label className="invisible text-xs">操作</Label>
-                        <Button onClick={handleAddRequirement} className="w-full h-9" size="sm">
-                          <Plus className="h-3.5 w-3.5 mr-1.5" />
-                          添加
-                        </Button>
-                      </div>
+                      {/* 数值输入或枚举多选 */}
+                      {selectedField && currentField && (
+                        <div className="space-y-2">
+                          {currentField.type === "numeric" ? (
+                            <div className="space-y-1.5">
+                              <Label className="text-xs text-muted-foreground">数值</Label>
+                              <Input
+                                placeholder="输入数值"
+                                value={value}
+                                onChange={(e) => setValue(e.target.value)}
+                                className="h-9"
+                                type="number"
+                              />
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <Label className="text-xs text-muted-foreground">
+                                选择选项（多选，选中项为"或"关系）
+                              </Label>
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                {currentField.enumValues?.map((enumValue) => (
+                                  <div
+                                    key={enumValue}
+                                    className="flex items-center space-x-2 p-2 rounded-md border bg-card hover:bg-accent/5 cursor-pointer"
+                                    onClick={() => handleEnumValueToggle(enumValue)}
+                                  >
+                                    <Checkbox
+                                      checked={selectedEnumValues.includes(enumValue)}
+                                      onCheckedChange={() => handleEnumValueToggle(enumValue)}
+                                    />
+                                    <label className="text-sm cursor-pointer flex-1">
+                                      {enumValue}
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -329,7 +428,11 @@ const HardwareRequirements = () => {
                                 {req.category}
                               </Badge>
                               <p className="text-sm text-foreground">
-                                {req.field} {req.operator} {req.value}
+                                {req.field} {req.operator}{" "}
+                                {Array.isArray(req.value) 
+                                  ? req.value.join(" 或 ")
+                                  : req.value
+                                }
                               </p>
                             </div>
                           </div>
