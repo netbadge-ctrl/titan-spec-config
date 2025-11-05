@@ -28,14 +28,14 @@ const hardwareCategories = {
     fields: [
       { key: "容量(GB)", label: "容量(GB)", type: "numeric" as FieldType },
       { key: "Speed(Mbps)", label: "Speed(Mbps)", type: "numeric" as FieldType },
-      { key: "硬件版本", label: "硬件版本", type: "enum" as FieldType, enumValues: ["DDR3", "DDR4", "DDR5"] },
+      { key: "硬件版本", label: "硬件版本", type: "enum" as FieldType, enumValues: ["A1", "A2", "A3", "A4", "A5", "A6"] },
     ],
   },
   网卡: {
     icon: Network,
     color: "bg-slate-50 dark:bg-slate-800/50",
     fields: [
-      { key: "硬件版本", label: "硬件版本", type: "enum" as FieldType, enumValues: ["1GbE", "10GbE", "25GbE", "40GbE", "100GbE"] },
+      { key: "硬件版本", label: "硬件版本", type: "enum" as FieldType, enumValues: ["A1", "A2", "A3", "A4", "A5", "A6"] },
     ],
   },
   HDD: {
@@ -44,7 +44,7 @@ const hardwareCategories = {
     fields: [
       { key: "容量", label: "容量", type: "numeric" as FieldType },
       { key: "接口速率(Gb/s)", label: "接口速率(Gb/s)", type: "numeric" as FieldType },
-      { key: "硬件版本", label: "硬件版本", type: "enum" as FieldType, enumValues: ["SATA2", "SATA3", "SAS"] },
+      { key: "硬件版本", label: "硬件版本", type: "enum" as FieldType, enumValues: ["A1", "A2", "A3", "A4", "A5", "A6"] },
     ],
   },
   SSD: {
@@ -55,7 +55,7 @@ const hardwareCategories = {
       { key: "接口速率(Gb/s)", label: "接口速率(Gb/s)", type: "numeric" as FieldType },
       { key: "颗粒类型", label: "颗粒类型", type: "enum" as FieldType, enumValues: ["SLC", "MLC", "TLC", "QLC"] },
       { key: "耐用等级(DEPD)", label: "耐用等级(DEPD)", type: "numeric" as FieldType },
-      { key: "硬件版本", label: "硬件版本", type: "enum" as FieldType, enumValues: ["SATA3", "SAS"] },
+      { key: "硬件版本", label: "硬件版本", type: "enum" as FieldType, enumValues: ["A1", "A2", "A3", "A4", "A5", "A6"] },
     ],
   },
   NVME: {
@@ -66,7 +66,7 @@ const hardwareCategories = {
       { key: "接口速率(Gb/s)", label: "接口速率(Gb/s)", type: "numeric" as FieldType },
       { key: "颗粒类型", label: "颗粒类型", type: "enum" as FieldType, enumValues: ["SLC", "MLC", "TLC", "QLC"] },
       { key: "耐用等级", label: "耐用等级", type: "numeric" as FieldType },
-      { key: "硬件版本", label: "硬件版本", type: "enum" as FieldType, enumValues: ["PCIe 3.0", "PCIe 4.0", "PCIe 5.0"] },
+      { key: "硬件版本", label: "硬件版本", type: "enum" as FieldType, enumValues: ["A1", "A2", "A3", "A4", "A5", "A6"] },
     ],
   },
 };
