@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Search, Plus, Trash2, Server, Cpu, HardDrive, Database, Zap, Network, ArrowLeft, Save } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -113,6 +113,15 @@ const HardwareRequirements = () => {
 
   // 获取当前选中字段的配置
   const currentField = hardwareCategories[selectedCategory].fields.find(f => f.key === selectedField);
+
+  // 当切换硬件类型时，自动选择该类型的第一个字段
+  useEffect(() => {
+    const firstField = hardwareCategories[selectedCategory].fields[0];
+    setSelectedField(firstField.key);
+    setValue("");
+    setSelectedEnumValues([]);
+    setOperator(firstField.type === "numeric" ? ">=" : "=");
+  }, [selectedCategory]);
 
   // 模拟客户数据
   const customers = [
