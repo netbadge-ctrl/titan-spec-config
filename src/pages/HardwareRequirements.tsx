@@ -82,12 +82,17 @@ const hardwareCategories = {
   },
 };
 
-type Requirement = {
+type Indicator = {
   id: string;
   category: string;
   field: string;
   operator: string;
   value: string | string[]; // 数值型为字符串，枚举型为字符串数组
+};
+
+type Rule = {
+  id: string;
+  indicators: Indicator[];
 };
 
 const HardwareRequirements = () => {
@@ -96,12 +101,14 @@ const HardwareRequirements = () => {
   const isEditMode = !!id;
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(isEditMode ? "腾讯云" : "");
+  const [serverType, setServerType] = useState<"GPU" | "CPU">("GPU");
   const [selectedCategory, setSelectedCategory] = useState<keyof typeof hardwareCategories>("内存");
   const [selectedField, setSelectedField] = useState("");
   const [operator, setOperator] = useState(">=");
   const [value, setValue] = useState("");
   const [selectedEnumValues, setSelectedEnumValues] = useState<string[]>([]);
-  const [requirements, setRequirements] = useState<Requirement[]>([]);
+  const [rules, setRules] = useState<Rule[]>([]);
+  const [currentRuleIndicators, setCurrentRuleIndicators] = useState<Indicator[]>([]);
 
   // 获取当前选中字段的配置
   const currentField = hardwareCategories[selectedCategory].fields.find(f => f.key === selectedField);
@@ -120,7 +127,7 @@ const HardwareRequirements = () => {
     customer.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleAddRequirement = () => {
+  const handleAddIndicator = () => {
     if (!selectedCustomer || !selectedField) return;
 
     // 验证：数值型必须有值，枚举型必须有选中项
@@ -140,21 +147,21 @@ const HardwareRequirements = () => {
       return;
     }
 
-    // 验证：同一硬件类型的同一性能指标只能有一个条件
-    const existingRequirement = requirements.find(
-      req => req.category === selectedCategory && req.field === selectedField
+    // 验证：当前规则中同一硬件类型的同一性能指标只能有一个条件
+    const existingIndicator = currentRuleIndicators.find(
+      ind => ind.category === selectedCategory && ind.field === selectedField
     );
 
-    if (existingRequirement) {
+    if (existingIndicator) {
       toast({
         title: "该性能指标已存在",
-        description: "同一硬件类型的同一性能指标只能配置一次",
+        description: "同一规则中同一硬件类型的同一性能指标只能配置一次",
         variant: "destructive",
       });
       return;
     }
 
-    const newRequirement: Requirement = {
+    const newIndicator: Indicator = {
       id: Date.now().toString(),
       category: selectedCategory,
       field: selectedField,
@@ -162,10 +169,42 @@ const HardwareRequirements = () => {
       value: currentField?.type === "numeric" ? value : selectedEnumValues,
     };
 
-    setRequirements([...requirements, newRequirement]);
+    setCurrentRuleIndicators([...currentRuleIndicators, newIndicator]);
     setSelectedField("");
     setValue("");
     setSelectedEnumValues([]);
+    
+    toast({
+      title: "指标已添加",
+      description: "可以继续添加更多指标或点击'添加规则'保存",
+    });
+  };
+
+  const handleAddRule = () => {
+    if (currentRuleIndicators.length === 0) {
+      toast({
+        title: "请先添加指标",
+        description: "至少需要添加一个指标才能创建规则",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newRule: Rule = {
+      id: Date.now().toString(),
+      indicators: currentRuleIndicators,
+    };
+
+    setRules([...rules, newRule]);
+    setCurrentRuleIndicators([]);
+    setSelectedField("");
+    setValue("");
+    setSelectedEnumValues([]);
+    
+    toast({
+      title: "规则已添加",
+      description: `已添加包含 ${currentRuleIndicators.length} 个指标的规则`,
+    });
   };
 
   // 处理枚举值选择
@@ -190,8 +229,12 @@ const HardwareRequirements = () => {
     }
   };
 
-  const handleDeleteRequirement = (id: string) => {
-    setRequirements(requirements.filter((req) => req.id !== id));
+  const handleDeleteRule = (ruleId: string) => {
+    setRules(rules.filter((rule) => rule.id !== ruleId));
+  };
+
+  const handleDeleteCurrentIndicator = (indicatorId: string) => {
+    setCurrentRuleIndicators(currentRuleIndicators.filter((ind) => ind.id !== indicatorId));
   };
 
   const CategoryIcon = hardwareCategories[selectedCategory].icon;
@@ -293,11 +336,39 @@ const HardwareRequirements = () => {
 
         {selectedCustomer && (
           <>
+            {/* 服务器类型选择 */}
+            <Card className="mb-6 shadow-sm border">
+              <CardHeader>
+                <CardTitle className="text-base">服务器类型</CardTitle>
+                <CardDescription className="text-sm">选择服务器类型以配置对应的硬件性能指标</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-3">
+                  <Button
+                    variant={serverType === "GPU" ? "default" : "outline"}
+                    onClick={() => setServerType("GPU")}
+                    className="flex-1"
+                  >
+                    <Zap className="h-4 w-4 mr-2" />
+                    GPU服务器配置
+                  </Button>
+                  <Button
+                    variant={serverType === "CPU" ? "default" : "outline"}
+                    onClick={() => setServerType("CPU")}
+                    className="flex-1"
+                  >
+                    <Cpu className="h-4 w-4 mr-2" />
+                    CPU服务器配置
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* 硬件类型选择 */}
             <Card className="mb-6 shadow-sm border">
               <CardHeader>
                 <CardTitle className="text-base">选择硬件类型</CardTitle>
-                <CardDescription className="text-sm">为 {selectedCustomer} 配置硬件性能指标</CardDescription>
+                <CardDescription className="text-sm">为 {selectedCustomer} 的 {serverType} 服务器配置硬件性能指标</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
@@ -403,12 +474,18 @@ const HardwareRequirements = () => {
                         </div>
                       )}
 
-                      {/* 添加指标按钮 */}
+                      {/* 添加指标和添加规则按钮 */}
                       {selectedField && (
-                        <Button onClick={handleAddRequirement} className="w-full h-9" size="sm">
-                          <Plus className="h-3.5 w-3.5 mr-1.5" />
-                          添加指标
-                        </Button>
+                        <div className="grid grid-cols-2 gap-3">
+                          <Button onClick={handleAddIndicator} variant="outline" className="h-9" size="sm">
+                            <Plus className="h-3.5 w-3.5 mr-1.5" />
+                            添加指标
+                          </Button>
+                          <Button onClick={handleAddRule} className="h-9" size="sm">
+                            <Plus className="h-3.5 w-3.5 mr-1.5" />
+                            添加规则
+                          </Button>
+                        </div>
                       )}
                     </div>
                   </CardContent>
@@ -416,38 +493,69 @@ const HardwareRequirements = () => {
               </CardContent>
             </Card>
 
-            {/* 已配置列表 */}
-            {requirements.length > 0 && (
-              <Card className="shadow-sm border">
+            {/* 当前规则中的指标 */}
+            {currentRuleIndicators.length > 0 && (
+              <Card className="mb-6 shadow-sm border border-primary/50 bg-primary/5">
                 <CardHeader>
-                  <CardTitle className="text-base">已配置的性能指标</CardTitle>
+                  <CardTitle className="text-base">当前规则中的指标</CardTitle>
                   <CardDescription className="text-sm">
-                    共 {requirements.length} 条配置 · 指标条件为且的关系，需要同时满足
+                    已添加 {currentRuleIndicators.length} 个指标 · 指标间为且的关系 · 点击"添加规则"保存此规则
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {requirements.map((req) => {
-                      const CategoryIcon = hardwareCategories[req.category as keyof typeof hardwareCategories].icon;
+                    {currentRuleIndicators.map((ind) => {
+                      const CategoryIcon = hardwareCategories[ind.category as keyof typeof hardwareCategories].icon;
                       
                       return (
                         <div
-                          key={req.id}
+                          key={ind.id}
                           className="flex items-center justify-between p-3 rounded-md border bg-card hover:bg-accent/5 transition-colors"
                         >
                           <div className="flex items-center gap-3 flex-1">
                             <CategoryIcon className="h-4 w-4 text-muted-foreground" />
                             <Badge variant="secondary" className="text-xs font-normal">
-                              {req.category}
+                              {ind.category}
                             </Badge>
                             <span className="text-sm text-foreground">
-                              {req.field} {req.operator}{" "}
-                              {Array.isArray(req.value) 
-                                ? req.value.join(" 或 ")
-                                : req.value
+                              {ind.field} {ind.operator}{" "}
+                              {Array.isArray(ind.value) 
+                                ? ind.value.join(" 或 ")
+                                : ind.value
                               }
                             </span>
                           </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => handleDeleteCurrentIndicator(ind.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* 已配置的规则列表 */}
+            {rules.length > 0 && (
+              <Card className="shadow-sm border">
+                <CardHeader>
+                  <CardTitle className="text-base">已配置的规则</CardTitle>
+                  <CardDescription className="text-sm">
+                    共 {rules.length} 条规则 · 规则间为或的关系，满足任意一条规则即可
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {rules.map((rule, ruleIndex) => (
+                      <div key={rule.id} className="border rounded-lg p-4 bg-muted/30">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-sm font-medium">规则 {ruleIndex + 1}</span>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button
@@ -462,20 +570,44 @@ const HardwareRequirements = () => {
                               <AlertDialogHeader>
                                 <AlertDialogTitle>确认删除</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  确定要删除该性能指标配置吗？此操作无法撤销。
+                                  确定要删除该规则吗？此操作无法撤销。
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>取消</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDeleteRequirement(req.id)}>
+                                <AlertDialogAction onClick={() => handleDeleteRule(rule.id)}>
                                   删除
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
                           </AlertDialog>
                         </div>
-                      );
-                    })}
+                        <div className="space-y-2">
+                          {rule.indicators.map((ind) => {
+                            const CategoryIcon = hardwareCategories[ind.category as keyof typeof hardwareCategories].icon;
+                            
+                            return (
+                              <div
+                                key={ind.id}
+                                className="flex items-center gap-3 p-2 rounded-md bg-card"
+                              >
+                                <CategoryIcon className="h-4 w-4 text-muted-foreground" />
+                                <Badge variant="secondary" className="text-xs font-normal">
+                                  {ind.category}
+                                </Badge>
+                                <span className="text-sm text-foreground">
+                                  {ind.field} {ind.operator}{" "}
+                                  {Array.isArray(ind.value) 
+                                    ? ind.value.join(" 或 ")
+                                    : ind.value
+                                  }
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
