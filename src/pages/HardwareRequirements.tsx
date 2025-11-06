@@ -92,6 +92,7 @@ type Indicator = {
 
 type Rule = {
   id: string;
+  serverType: "GPU" | "CPU";
   indicators: Indicator[];
 };
 
@@ -192,6 +193,7 @@ const HardwareRequirements = () => {
 
     const newRule: Rule = {
       id: Date.now().toString(),
+      serverType: serverType,
       indicators: currentRuleIndicators,
     };
 
@@ -497,9 +499,9 @@ const HardwareRequirements = () => {
             {currentRuleIndicators.length > 0 && (
               <Card className="mb-6 shadow-sm border border-primary/50 bg-primary/5">
                 <CardHeader>
-                  <CardTitle className="text-base">性能指标规则</CardTitle>
+                  <CardTitle className="text-base">当前正在编辑的指标</CardTitle>
                   <CardDescription className="text-sm">
-                    已添加1个规则
+                    已添加 {currentRuleIndicators.length} 个指标 · 指标间为且的关系 · 点击"添加规则"保存此规则
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -541,13 +543,13 @@ const HardwareRequirements = () => {
               </Card>
             )}
 
-            {/* 已配置的规则列表 */}
+            {/* 性能指标规则 */}
             {rules.length > 0 && (
               <Card className="shadow-sm border">
                 <CardHeader>
-                  <CardTitle className="text-base">已配置的规则</CardTitle>
+                  <CardTitle className="text-base">性能指标规则</CardTitle>
                   <CardDescription className="text-sm">
-                    共 {rules.length} 条规则 · 规则间为或的关系，满足任意一条规则即可
+                    已添加 {rules.length} 个规则 · 规则间为或的关系，满足任意一条规则即可
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -555,7 +557,12 @@ const HardwareRequirements = () => {
                     {rules.map((rule, ruleIndex) => (
                       <div key={rule.id} className="border rounded-lg p-4 bg-muted/30">
                         <div className="flex items-center justify-between mb-3">
-                          <span className="text-sm font-medium">规则 {ruleIndex + 1}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium">规则 {ruleIndex + 1}</span>
+                            <Badge variant={rule.serverType === "GPU" ? "default" : "secondary"} className="text-xs">
+                              {rule.serverType}服务器指标规则
+                            </Badge>
+                          </div>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button
@@ -592,11 +599,15 @@ const HardwareRequirements = () => {
                                 className="flex items-center gap-3 p-2 rounded-md bg-card"
                               >
                                 <CategoryIcon className="h-4 w-4 text-muted-foreground" />
-                                <Badge variant="secondary" className="text-xs font-normal">
+                                <Badge variant="outline" className="text-xs font-normal">
                                   {ind.category}
                                 </Badge>
-                                <span className="text-sm text-foreground">
-                                  {ind.field} {ind.operator}{" "}
+                                <span className="text-xs text-muted-foreground">字段:</span>
+                                <span className="text-sm text-foreground font-medium">{ind.field}</span>
+                                <span className="text-xs text-muted-foreground">条件:</span>
+                                <span className="text-sm text-foreground">{ind.operator}</span>
+                                <span className="text-xs text-muted-foreground">数值:</span>
+                                <span className="text-sm text-foreground font-medium">
                                   {Array.isArray(ind.value) 
                                     ? ind.value.join(" 或 ")
                                     : ind.value
