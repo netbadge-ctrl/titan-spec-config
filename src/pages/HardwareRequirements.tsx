@@ -443,7 +443,7 @@ const HardwareRequirements = () => {
                         </Select>
                       </div>
 
-                      {selectedField && currentField?.type === "numeric" && (
+                      {currentField?.type === "numeric" && (
                         <div className="space-y-1.5">
                           <Label className="text-xs text-muted-foreground">数值</Label>
                           <Input
@@ -458,7 +458,7 @@ const HardwareRequirements = () => {
                     </div>
 
                     {/* 枚举多选 */}
-                    {selectedField && currentField?.type === "enum" && (
+                    {currentField?.type === "enum" && (
                       <div className="space-y-2">
                         <Label className="text-xs text-muted-foreground">
                           选择选项（多选，选中项为"或"关系）
@@ -483,19 +483,17 @@ const HardwareRequirements = () => {
                       </div>
                     )}
 
-                    {/* 添加指标和添加规则按钮 */}
-                    {selectedField && (
-                      <div className="grid grid-cols-2 gap-3">
-                        <Button onClick={handleAddIndicator} variant="outline" className="h-9" size="sm">
-                          <Plus className="h-3.5 w-3.5 mr-1.5" />
-                          添加指标
-                        </Button>
-                        <Button onClick={handleAddRule} className="h-9" size="sm">
-                          <Plus className="h-3.5 w-3.5 mr-1.5" />
-                          添加规则
-                        </Button>
-                      </div>
-                    )}
+                    {/* 添加指标和添加规则按钮 - 始终显示 */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button onClick={handleAddIndicator} variant="outline" className="h-9" size="sm">
+                        <Plus className="h-3.5 w-3.5 mr-1.5" />
+                        添加指标
+                      </Button>
+                      <Button onClick={handleAddRule} className="h-9" size="sm">
+                        <Plus className="h-3.5 w-3.5 mr-1.5" />
+                        添加规则
+                      </Button>
+                    </div>
 
                     {/* 已添加的指标列表 */}
                     {currentRuleIndicators.length > 0 && (
