@@ -483,21 +483,17 @@ const HardwareRequirements = () => {
                       </div>
                     )}
 
-                    {/* 添加指标和添加规则按钮 - 始终显示 */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <Button onClick={handleAddIndicator} variant="outline" className="h-9" size="sm">
+                    {/* 添加指标按钮 - 始终显示 */}
+                    <div>
+                      <Button onClick={handleAddIndicator} variant="outline" className="h-9 w-full" size="sm">
                         <Plus className="h-3.5 w-3.5 mr-1.5" />
                         添加指标
-                      </Button>
-                      <Button onClick={handleAddRule} className="h-9" size="sm">
-                        <Plus className="h-3.5 w-3.5 mr-1.5" />
-                        添加规则
                       </Button>
                     </div>
 
                     {/* 已添加的指标列表 */}
                     {currentRuleIndicators.length > 0 && (
-                      <div className="space-y-2 pt-2 border-t">
+                      <div className="space-y-3 pt-2 border-t">
                         <Label className="text-xs text-muted-foreground">
                           已添加 {currentRuleIndicators.length} 个指标（指标间为且的关系）
                         </Label>
@@ -535,6 +531,12 @@ const HardwareRequirements = () => {
                             );
                           })}
                         </div>
+                        
+                        {/* 保存为规则按钮 - 在已添加指标列表下方 */}
+                        <Button onClick={handleAddRule} className="h-9 w-full" size="sm">
+                          <Save className="h-3.5 w-3.5 mr-1.5" />
+                          保存为规则
+                        </Button>
                       </div>
                     )}
                   </div>
