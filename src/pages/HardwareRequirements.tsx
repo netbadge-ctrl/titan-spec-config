@@ -489,59 +489,55 @@ const HardwareRequirements = () => {
                           </Button>
                         </div>
                       )}
+
+                      {/* 已添加的指标列表 */}
+                      {currentRuleIndicators.length > 0 && (
+                        <div className="space-y-2 pt-2 border-t">
+                          <Label className="text-xs text-muted-foreground">
+                            已添加 {currentRuleIndicators.length} 个指标（指标间为且的关系）
+                          </Label>
+                          <div className="space-y-2">
+                            {currentRuleIndicators.map((ind) => {
+                              const IndicatorIcon = hardwareCategories[ind.category as keyof typeof hardwareCategories].icon;
+                              
+                              return (
+                                <div
+                                  key={ind.id}
+                                  className="flex items-center justify-between p-2 rounded-md border bg-card"
+                                >
+                                  <div className="flex items-center gap-2 flex-1">
+                                    <IndicatorIcon className="h-3.5 w-3.5 text-muted-foreground" />
+                                    <Badge variant="secondary" className="text-xs font-normal">
+                                      {ind.category}
+                                    </Badge>
+                                    <span className="text-xs text-foreground">
+                                      {ind.field} {ind.operator}{" "}
+                                      {Array.isArray(ind.value) 
+                                        ? ind.value.join(" 或 ")
+                                        : ind.value
+                                      }
+                                    </span>
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6"
+                                    onClick={() => handleDeleteCurrentIndicator(ind.id)}
+                                  >
+                                    <Trash2 className="h-3 w-3 text-destructive" />
+                                  </Button>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
               </CardContent>
             </Card>
 
-            {/* 当前规则中的指标 */}
-            {currentRuleIndicators.length > 0 && (
-              <Card className="mb-6 shadow-sm border border-primary/50 bg-primary/5">
-                <CardHeader>
-                  <CardTitle className="text-base">当前正在编辑的指标</CardTitle>
-                  <CardDescription className="text-sm">
-                    已添加 {currentRuleIndicators.length} 个指标 · 指标间为且的关系 · 点击"添加规则"保存此规则
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {currentRuleIndicators.map((ind) => {
-                      const CategoryIcon = hardwareCategories[ind.category as keyof typeof hardwareCategories].icon;
-                      
-                      return (
-                        <div
-                          key={ind.id}
-                          className="flex items-center justify-between p-3 rounded-md border bg-card hover:bg-accent/5 transition-colors"
-                        >
-                          <div className="flex items-center gap-3 flex-1">
-                            <CategoryIcon className="h-4 w-4 text-muted-foreground" />
-                            <Badge variant="secondary" className="text-xs font-normal">
-                              {ind.category}
-                            </Badge>
-                            <span className="text-sm text-foreground">
-                              {ind.field} {ind.operator}{" "}
-                              {Array.isArray(ind.value) 
-                                ? ind.value.join(" 或 ")
-                                : ind.value
-                              }
-                            </span>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => handleDeleteCurrentIndicator(ind.id)}
-                          >
-                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                          </Button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
 
             {/* 性能指标规则 */}
             {rules.length > 0 && (
