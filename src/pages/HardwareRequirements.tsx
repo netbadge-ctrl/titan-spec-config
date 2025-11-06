@@ -104,7 +104,7 @@ const HardwareRequirements = () => {
   const [selectedCustomer, setSelectedCustomer] = useState(isEditMode ? "腾讯云" : "");
   const [serverType, setServerType] = useState<"GPU" | "CPU">("GPU");
   const [selectedCategory, setSelectedCategory] = useState<keyof typeof hardwareCategories>("内存");
-  const [selectedField, setSelectedField] = useState("");
+  const [selectedField, setSelectedField] = useState(hardwareCategories["内存"].fields[0].key);
   const [operator, setOperator] = useState(">=");
   const [value, setValue] = useState("");
   const [selectedEnumValues, setSelectedEnumValues] = useState<string[]>([]);
