@@ -497,7 +497,7 @@ const HardwareRequirements = () => {
             {currentRuleIndicators.length > 0 && (
               <Card className="mb-6 shadow-sm border border-primary/50 bg-primary/5">
                 <CardHeader>
-                  <CardTitle className="text-base">当前规则中的指标</CardTitle>
+                  <CardTitle className="text-base">性能指标规则</CardTitle>
                   <CardDescription className="text-sm">
                     已添加 {currentRuleIndicators.length} 个指标 · 指标间为且的关系 · 点击"添加规则"保存此规则
                   </CardDescription>
