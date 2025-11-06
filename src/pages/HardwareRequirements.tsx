@@ -347,13 +347,14 @@ const HardwareRequirements = () => {
 
         {selectedCustomer && (
           <>
-            {/* 服务器类型选择 */}
+            {/* 服务器类型和硬件类型选择 */}
             <Card className="mb-6 shadow-sm border">
               <CardHeader>
                 <CardTitle className="text-base">服务器类型</CardTitle>
                 <CardDescription className="text-sm">选择服务器类型以配置对应的硬件性能指标</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-6">
+                {/* 服务器类型选择按钮 */}
                 <div className="flex gap-3">
                   <Button
                     variant={serverType === "GPU" ? "default" : "outline"}
@@ -372,178 +373,177 @@ const HardwareRequirements = () => {
                     CPU服务器配置
                   </Button>
                 </div>
+
+                {/* 硬件类型选择 */}
+                <div>
+                  <div className="mb-3">
+                    <h3 className="text-sm font-medium text-foreground">选择硬件类型</h3>
+                    <p className="text-xs text-muted-foreground mt-1">为 {selectedCustomer} 的 {serverType} 服务器配置硬件性能指标</p>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                    {Object.entries(hardwareCategories).map(([key, config]) => {
+                      const Icon = config.icon;
+                      const isSelected = selectedCategory === key;
+                      return (
+                        <button
+                          key={key}
+                          onClick={() => setSelectedCategory(key as keyof typeof hardwareCategories)}
+                          className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                            isSelected
+                              ? 'border-primary bg-primary/5 shadow-sm'
+                              : 'border-border bg-card hover:border-primary/50 hover:bg-accent/5'
+                          }`}
+                        >
+                          <Icon className={`h-5 w-5 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
+                          <span className={`text-sm font-medium ${isSelected ? 'text-primary' : 'text-foreground'}`}>
+                            {key}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
-            {/* 硬件类型选择 */}
+            {/* 性能指标配置 */}
             <Card className="mb-6 shadow-sm border">
-              <CardHeader>
-                <CardTitle className="text-base">选择硬件类型</CardTitle>
-                <CardDescription className="text-sm">为 {selectedCustomer} 的 {serverType} 服务器配置硬件性能指标</CardDescription>
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-sm font-medium">
+                  <CategoryIcon className="h-4 w-4 text-primary" />
+                  添加 {selectedCategory} 性能指标
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
-                  {Object.entries(hardwareCategories).map(([key, config]) => {
-                    const Icon = config.icon;
-                    const isSelected = selectedCategory === key;
-                    return (
-                      <button
-                        key={key}
-                        onClick={() => setSelectedCategory(key as keyof typeof hardwareCategories)}
-                        className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
-                          isSelected
-                            ? 'border-primary bg-primary/5 shadow-sm'
-                            : 'border-border bg-card hover:border-primary/50 hover:bg-accent/5'
-                        }`}
-                      >
-                        <Icon className={`h-5 w-5 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
-                        <span className={`text-sm font-medium ${isSelected ? 'text-primary' : 'text-foreground'}`}>
-                          {key}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <Card className={`border ${hardwareCategories[selectedCategory].color}`}>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-sm font-medium">
-                      <CategoryIcon className="h-4 w-4 text-primary" />
-                      添加 {selectedCategory} 性能指标
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="space-y-4">
-                      {/* 字段、条件、数值（如果是数值型） */}
-                      <div className={`grid gap-3 ${currentField?.type === "numeric" ? "grid-cols-1 md:grid-cols-3" : "grid-cols-1 md:grid-cols-2"}`}>
-                        <div className="space-y-1.5">
-                          <Label className="text-xs text-muted-foreground">字段</Label>
-                          <Select value={selectedField} onValueChange={handleFieldChange}>
-                            <SelectTrigger className="h-9">
-                              <SelectValue placeholder="选择字段" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {hardwareCategories[selectedCategory].fields.map((field) => (
-                                <SelectItem key={field.key} value={field.key}>
-                                  {field.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <Label className="text-xs text-muted-foreground">条件</Label>
-                          <Select value={operator} onValueChange={setOperator} disabled>
-                            <SelectTrigger className="h-9">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value=">=">&gt;=</SelectItem>
-                              <SelectItem value="=">=</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        {selectedField && currentField?.type === "numeric" && (
-                          <div className="space-y-1.5">
-                            <Label className="text-xs text-muted-foreground">数值</Label>
-                            <Input
-                              placeholder="输入数值"
-                              value={value}
-                              onChange={(e) => setValue(e.target.value)}
-                              className="h-9"
-                              type="number"
-                            />
-                          </div>
-                        )}
-                      </div>
-
-                      {/* 枚举多选 */}
-                      {selectedField && currentField?.type === "enum" && (
-                        <div className="space-y-2">
-                          <Label className="text-xs text-muted-foreground">
-                            选择选项（多选，选中项为"或"关系）
-                          </Label>
-                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                            {currentField.enumValues?.map((enumValue) => (
-                              <div
-                                key={enumValue}
-                                className="flex items-center space-x-2 p-2 rounded-md border bg-card hover:bg-accent/5 cursor-pointer"
-                                onClick={() => handleEnumValueToggle(enumValue)}
-                              >
-                                <Checkbox
-                                  checked={selectedEnumValues.includes(enumValue)}
-                                  onCheckedChange={() => handleEnumValueToggle(enumValue)}
-                                />
-                                <label className="text-sm cursor-pointer flex-1">
-                                  {enumValue}
-                                </label>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* 添加指标和添加规则按钮 */}
-                      {selectedField && (
-                        <div className="grid grid-cols-2 gap-3">
-                          <Button onClick={handleAddIndicator} variant="outline" className="h-9" size="sm">
-                            <Plus className="h-3.5 w-3.5 mr-1.5" />
-                            添加指标
-                          </Button>
-                          <Button onClick={handleAddRule} className="h-9" size="sm">
-                            <Plus className="h-3.5 w-3.5 mr-1.5" />
-                            添加规则
-                          </Button>
-                        </div>
-                      )}
-
-                      {/* 已添加的指标列表 */}
-                      {currentRuleIndicators.length > 0 && (
-                        <div className="space-y-2 pt-2 border-t">
-                          <Label className="text-xs text-muted-foreground">
-                            已添加 {currentRuleIndicators.length} 个指标（指标间为且的关系）
-                          </Label>
-                          <div className="space-y-2">
-                            {currentRuleIndicators.map((ind) => {
-                              const IndicatorIcon = hardwareCategories[ind.category as keyof typeof hardwareCategories].icon;
-                              
-                              return (
-                                <div
-                                  key={ind.id}
-                                  className="flex items-center justify-between p-2 rounded-md border bg-card"
-                                >
-                                  <div className="flex items-center gap-2 flex-1">
-                                    <IndicatorIcon className="h-3.5 w-3.5 text-muted-foreground" />
-                                    <Badge variant="secondary" className="text-xs font-normal">
-                                      {ind.category}
-                                    </Badge>
-                                    <span className="text-xs text-foreground">
-                                      {ind.field} {ind.operator}{" "}
-                                      {Array.isArray(ind.value) 
-                                        ? ind.value.join(" 或 ")
-                                        : ind.value
-                                      }
-                                    </span>
-                                  </div>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6"
-                                    onClick={() => handleDeleteCurrentIndicator(ind.id)}
-                                  >
-                                    <Trash2 className="h-3 w-3 text-destructive" />
-                                  </Button>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
+              <CardContent className="pt-0">
+                <div className="space-y-4">
+                  {/* 字段、条件、数值（如果是数值型） */}
+                  <div className={`grid gap-3 ${currentField?.type === "numeric" ? "grid-cols-1 md:grid-cols-3" : "grid-cols-1 md:grid-cols-2"}`}>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-muted-foreground">字段</Label>
+                      <Select value={selectedField} onValueChange={handleFieldChange}>
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="选择字段" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {hardwareCategories[selectedCategory].fields.map((field) => (
+                            <SelectItem key={field.key} value={field.key}>
+                              {field.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
-                  </CardContent>
-                </Card>
+
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-muted-foreground">条件</Label>
+                      <Select value={operator} onValueChange={setOperator} disabled>
+                        <SelectTrigger className="h-9">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value=">=">&gt;=</SelectItem>
+                          <SelectItem value="=">=</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {selectedField && currentField?.type === "numeric" && (
+                      <div className="space-y-1.5">
+                        <Label className="text-xs text-muted-foreground">数值</Label>
+                        <Input
+                          placeholder="输入数值"
+                          value={value}
+                          onChange={(e) => setValue(e.target.value)}
+                          className="h-9"
+                          type="number"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 枚举多选 */}
+                  {selectedField && currentField?.type === "enum" && (
+                    <div className="space-y-2">
+                      <Label className="text-xs text-muted-foreground">
+                        选择选项（多选，选中项为"或"关系）
+                      </Label>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {currentField.enumValues?.map((enumValue) => (
+                          <div
+                            key={enumValue}
+                            className="flex items-center space-x-2 p-2 rounded-md border bg-card hover:bg-accent/5 cursor-pointer"
+                            onClick={() => handleEnumValueToggle(enumValue)}
+                          >
+                            <Checkbox
+                              checked={selectedEnumValues.includes(enumValue)}
+                              onCheckedChange={() => handleEnumValueToggle(enumValue)}
+                            />
+                            <label className="text-sm cursor-pointer flex-1">
+                              {enumValue}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 添加指标和添加规则按钮 */}
+                  {selectedField && (
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button onClick={handleAddIndicator} variant="outline" className="h-9" size="sm">
+                        <Plus className="h-3.5 w-3.5 mr-1.5" />
+                        添加指标
+                      </Button>
+                      <Button onClick={handleAddRule} className="h-9" size="sm">
+                        <Plus className="h-3.5 w-3.5 mr-1.5" />
+                        添加规则
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* 已添加的指标列表 */}
+                  {currentRuleIndicators.length > 0 && (
+                    <div className="space-y-2 pt-2 border-t">
+                      <Label className="text-xs text-muted-foreground">
+                        已添加 {currentRuleIndicators.length} 个指标（指标间为且的关系）
+                      </Label>
+                      <div className="space-y-2">
+                        {currentRuleIndicators.map((ind) => {
+                          const IndicatorIcon = hardwareCategories[ind.category as keyof typeof hardwareCategories].icon;
+                          
+                          return (
+                            <div
+                              key={ind.id}
+                              className="flex items-center justify-between p-2 rounded-md border bg-card"
+                            >
+                              <div className="flex items-center gap-2 flex-1">
+                                <IndicatorIcon className="h-3.5 w-3.5 text-muted-foreground" />
+                                <Badge variant="secondary" className="text-xs font-normal">
+                                  {ind.category}
+                                </Badge>
+                                <span className="text-xs text-foreground">
+                                  {ind.field} {ind.operator}{" "}
+                                  {Array.isArray(ind.value) 
+                                    ? ind.value.join(" 或 ")
+                                    : ind.value
+                                  }
+                                </span>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => handleDeleteCurrentIndicator(ind.id)}
+                              >
+                                <Trash2 className="h-3 w-3 text-destructive" />
+                              </Button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
