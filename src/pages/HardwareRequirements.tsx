@@ -499,7 +499,7 @@ const HardwareRequirements = () => {
                 <CardHeader>
                   <CardTitle className="text-base">性能指标规则</CardTitle>
                   <CardDescription className="text-sm">
-                    已添加 {currentRuleIndicators.length} 个指标 · 指标间为且的关系 · 点击"添加规则"保存此规则
+                    已添加1个规则
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
